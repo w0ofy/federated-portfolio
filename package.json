@@ -1,0 +1,25 @@
+{
+  "name": "federated-portfolio",
+  "version": "1.0.0",
+  "description": "Personal portfolio build on top of federated architecture",
+  "main": "index.js",
+  "dependencies": {},
+  "devDependencies": {
+    "@lerna/exec": "^3.21.0",
+    "@lerna/run": "^3.21.0"
+  },
+  "scripts": {
+    "deps": "lerna exec 'npm i --ignore-scripts' --scope={navigation,host}-app",
+    "start": "lerna exec 'npm start' --scope={navigation,host}-app"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/bigwoof91/federated-portfolio.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/bigwoof91/federated-portfolio/issues"
+  },
+  "homepage": "https://github.com/bigwoof91/federated-portfolio#readme"
+}

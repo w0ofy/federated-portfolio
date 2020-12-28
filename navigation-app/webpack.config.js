@@ -2,6 +2,7 @@ const webpack = require('webpack');
 const { ModuleFederationPlugin } = require('webpack').container;
 const path = require('path');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin');
 const ReactRefreshWebpackPlugin = require('@pmmmwh/react-refresh-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const deps = require('./package.json').dependencies;
@@ -13,29 +14,31 @@ module.exports = {
   mode: 'development',
   devServer: {
     contentBase: path.join(__dirname, 'dist'),
-    port: 3000,
+    port: 3001,
     hot: true,
-    open: true,
   },
   output: {
-    publicPath: 'http://localhost:3000/',
+    publicPath: 'http://localhost:3001/',
     chunkFilename: '[id].[contenthash].js',
+  },
+  resolve: {
+    extensions: ['.ts', '.tsx', '.js'],
   },
   module: {
     rules: [
       {
-        test: /bootstrap\.js$/,
+        test: /bootstrap\.tsx$/,
         loader: 'bundle-loader',
         options: {
           lazy: true,
         },
       },
       {
-        test: /\.js?$/,
+        test: /\.[jt]sx?$/,
         loader: 'babel-loader',
         exclude: /node_modules/,
         options: {
-          presets: ['@babel/preset-react'],
+          presets: ['@babel/preset-react', '@babel/preset-typescript'],
           plugins: ['react-refresh/babel'].filter(Boolean),
         },
       },
@@ -49,20 +52,21 @@ module.exports = {
     ],
   },
   plugins: [
+    new ForkTsCheckerWebpackPlugin(),
     new HtmlWebpackPlugin({
       template: './public/index.html',
     }),
     new ReactRefreshWebpackPlugin(),
     new webpack.HotModuleReplacementPlugin(),
     new ModuleFederationPlugin({
-      name: 'hostApp',
-      library: { type: 'var', name: 'hostApp' },
+      name: 'navigationApp',
+      library: { type: 'var', name: 'navigationApp' },
       filename: 'remoteEntry.js',
-      remotes: {
-        navigationApp: 'navigationApp',
-      },
       exposes: {
-        './App': './src/App',
+        './Navigation': './src/App',
+      },
+      remotes: {
+        hostApp: 'hostApp',
       },
       shared: {
         ...deps,
@@ -76,5 +80,8 @@ module.exports = {
         },
       },
     }),
-  ],
+  ].filter(Boolean),
+  optimization: {
+    minimize: true,
+  },
 };
